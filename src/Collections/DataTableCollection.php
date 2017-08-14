@@ -3,15 +3,32 @@
 namespace Laralabs\DataTableJson\Collections;
 
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\Schema;
-use Laralabs\DataTableJson\DataTableJsonConverter;
 use Laralabs\DataTableJson\Facades\DataTableJsonFacade;
 
 class DataTableCollection extends Collection
 {
-    public function __construct($items = [])
+    /**
+     * @var array
+     */
+    protected $items;
+
+    /**
+     * @var mixed
+     */
+    protected $model;
+
+    /**
+     * @var \Illuminate\Support\Collection
+     */
+    protected $collection;
+
+    public function __construct($params = ['items' => [], 'model' => null])
     {
-        parent::__construct($items);
+        parent::__construct();
+        $this->items = $params['items'];
+        $this->model = $params['model'];
+
+        $this->collection = new \Illuminate\Support\Collection($this->items);
     }
 
     /**
@@ -23,8 +40,10 @@ class DataTableCollection extends Collection
     public function toDataTableJson(array $columns = [])
     {
         if($this->items) {
-            $item = current($this->items);
+            $item = $this->collection->first();
             $modelColumns = $item->columns;
+        }elseif($this->model){
+            $modelColumns = $this->model->columns;
         }else{
             $modelColumns = [];
         }
@@ -35,7 +54,7 @@ class DataTableCollection extends Collection
             abort(500, 'No columns specified in model or function argument');
         }
 
-        $collection = $this->keyBy('id')->map(function ($item) use ($columns) {
+        $collection = $this->collection->keyBy('id')->map(function ($item) use ($columns) {
             $maps = [];
             foreach($columns as $column) {
                 if(!empty($column['content'])) {

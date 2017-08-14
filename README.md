@@ -6,12 +6,12 @@ Recently I started using a Vue DataTable component and found that I needed a sim
 
 ## Installation
 
-Install the package via compser
+Install the package via composer
 
 ```json
 {
     "require": {
-      "laralabs/datatablejson": "~1.0.0"     
+      "laralabs/datatablejson": "~1.0.1"     
     }
 }
 ```
